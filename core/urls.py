@@ -20,5 +20,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('Tracker.urls')),
-    path("admin/", admin.site.urls),
+    path("admin/", admin.site.urls), # change admin name to protect website fro, hackers 
 ]

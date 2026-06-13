@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
      @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap");
 
@@ -35,6 +36,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   margin: 0;
+
 }
 
 .header {
@@ -52,6 +54,7 @@ body {
 .balance-container {
   display: flex;
   flex-direction: column;
+  font-weight: bold;
 }
 
 .container {
@@ -71,6 +74,8 @@ h2 {
   letter-spacing: 1px;
   margin: 0;
   font-size: 2rem;
+  font-weight: bold;
+  
 }
 
 h3 {
@@ -151,6 +156,9 @@ input[type="number"] {
   list-style-type: none;
   padding: 0;
   margin-bottom: 40px;
+  height: 100px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .list li {
@@ -186,8 +194,8 @@ input[type="number"] {
   margin: 10px 0;
   position: absolute;
   top: 50%;
-  right: 0;
-  transform: translate(100%, -73%);
+  right: 10px;
+  transform: translateY(100%, -73%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -217,13 +225,38 @@ input[type="number"] {
 }
 
 .notification-container p {
-  margin: 0;
+  margin:0;
+}
+.my{
+  font-weight: bold;
+}
+.my2{
+  margin-top: 50px;
+  padding-top: 30px;
 }
 
     </style>
   </head>
   <body>
-    <h1>Expense Tracker</h1>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+     
+    {% if messages %}
+  {% for message in messages %}
+    <script>
+      alert("{{ message }}");
+    </script>
+  {% endfor %}
+  {% endif %} 
+    
+    <h1 class = "my2" style = "font-weight: bold;">Expense Tracker</h1>
+    <a  href  ="{% url 'logout_view' %}" class="btn ">log out</a>
+    {{request.user.username}} <br>
+    {{request.user.first_name}} 
+    {{request.user.last_name}}
+
+    <form method="POST" >
+      {% csrf_token %}
+    </form>
     <div class="container">
       <div class="header">
         <img
@@ -231,24 +264,32 @@ input[type="number"] {
           alt="Expense Tracker"
         />
         <div class="balance-container">
-          <h2>Your Balance</h2>
-          <h2 id="balance" class="balance">$0.00</h2>
+          <h1 class = my>Your Balance</h1>
+          <h2 id="balance" class="balance">${{current_balance.current_balance}}</h2>
         </div>
       </div>
       <div class="inc-exp-container">
         <div>
           <h4>Income</h4>
-          <p id="money-plus" class="money plus">+$0.00</p>
+          <p id="money-plus" class="money plus">+${{income}}</p>
         </div>
         <div>
           <h4>Expenses</h4>
-          <p id="money-minus" class="money minus">-$0.00</p>
+          <p id="money-minus" class="money minus">-${{expense}}</p>
         </div>
       </div>
       <h3>History</h3>
-      <ul id="list" class="list"></ul>
+      <ul id="list" class="list">
+        {%for Transaction in Transactions%}
+        <li class="{% if Transaction.expense_type == 'DEBIT' %}minus{% else %}plus{% endif %}">
+          {{Transaction.description}}<span>{{Transaction.amount}}</span>
+          <a class="delete-btn" href="{% url 'delete_transaction' Transaction.id %}">
+            <i class="fa-solid fa-trash"></i></a>
+        </li>
+        {%endfor%}
+      </ul>
       <h3>Add new transaction</h3>
-      <form method = "POST" id="form">
+      <form method = "POST" id="form"> 
         {% csrf_token %}
         <div class="form-control">
           <label for="text">Description</label>
@@ -268,6 +309,6 @@ input[type="number"] {
     <div class="notification-container" id="notification">
       <p>Please add a description and amount</p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+   
   </body>
 </html>
